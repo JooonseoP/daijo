@@ -46,3 +46,10 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+# Environment variables (secrets)
+.env
+.env.*
+
+# Test coverage
+coverage/
