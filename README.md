@@ -1,16 +1,77 @@
-# daijo
+# 다잊어 (Daijo)
 
-A new Flutter project.
+> **"살 물건은 적어두고, 나머진 다 잊어!"**
+> 다 잊어도 괜찮아요 — 다이소에 도착하면 알려드릴게요.
 
-## Getting Started
+**다잊어**는 위치 기반(지오펜싱) 쇼핑 리마인더 앱입니다. 사둘 물건을 미리 적어두면, 다이소 매장 반경에 진입하는 순간 작성해둔 쇼핑 메모를 알림으로 띄워 "매장에 들어서면 사려던 걸 잊어버리는" 문제를 해결합니다.
 
-This project is a starting point for a Flutter application.
+## 왜 만드나요?
 
-A few resources to get you started if this is your first Flutter project:
+매장 입구를 지나는 순간 사려던 목록을 잊는 건 단순 건망증이 아니라 인지적 특성입니다.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **출입문 효과 (Doorway Effect)** — 경계(매장 입구)를 통과하면 뇌가 맥락 종료로 판단해 작업 기억을 초기화
+- **맥락 의존 기억 (Context-Dependent Memory)** — 메모를 적은 환경(집·사무실)과 회상해야 할 환경(매장)의 불일치
+- **미래 계획 기억 (Prospective Memory) 실패** — 적절한 시점·장소에서 과제를 떠올리지 못함 (외부 트리거 부재가 주원인)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+다잊어는 **위치라는 외부 트리거**로 이 인지적 공백을 메웁니다.
+
+## 주요 기능
+
+- **지오펜싱 알림** — 다이소 매장 반경 진입 시 쇼핑 메모를 알림/팝업으로 강제 노출
+- **매장 인앱 모드 (In-Store Mode)** — 장바구니를 든 한 손 조작을 위한 대형 터치 영역, 햅틱 피드백, 전 항목 완료 시 완료 애니메이션
+- **스마트 입력** — 다이소 스테디셀러 사전(내장) 자동완성, 개인 구매 히스토리 기반 추천, 카테고리 프리셋 칩 퀵 셀렉트
+- **아카이브 & 재등록** — 과거 쇼핑 내역을 날짜별/매장별 열람, 자주 산 품목을 원탭으로 현재 목록에 재등록
+- **백업 & 복원** — JSON/CSV 내보내기·불러오기, Google Drive / iCloud 연동
+- **오프라인 동작** — 전국 매장 좌표 DB를 로컬에 내장하여 네트워크 없이 동작
+
+## 기술 아키텍처
+
+배터리·비용 효율을 위해 실시간 GPS 폴링 대신 다음 전략을 채택합니다.
+
+| 구분 | 전략 |
+| --- | --- |
+| 데이터 관리 | 전국 다이소 매장 좌표를 로컬 SQLite/Isar DB에 경량 내장 (오프라인 지원) |
+| 동적 지오펜싱 | OS 등록 제한(iOS 20 / Android 100) 극복 — 이동 감지 시 반경 5~10km 내 매장 10~20개만 선별 등록 |
+| 저전력 최적화 | 가속도계 + Wi-Fi 스캔 조합의 하드웨어 가속 위치 감지 활용 |
+
+## 지원 플랫폼
+
+Android · iOS · Web · Windows · macOS · Linux (Flutter 멀티플랫폼)
+
+## 개발 환경 설정
+
+이 프로젝트는 [FVM](https://fvm.app)으로 Flutter 버전을 고정합니다 (`.fvmrc` → **Flutter 3.29.2**).
+
+```bash
+# 1. FVM으로 고정된 Flutter SDK 설치
+fvm install
+
+# 2. 의존성 설치
+fvm flutter pub get
+
+# 3. 실행
+fvm flutter run
+```
+
+FVM을 쓰지 않는다면 Flutter 3.29.2 (Dart SDK `^3.7.2`)를 직접 사용하세요.
+
+### 자주 쓰는 명령
+
+```bash
+fvm flutter analyze          # 정적 분석
+fvm flutter test             # 테스트
+fvm flutter test --coverage  # 커버리지
+fvm flutter build apk        # Android 릴리스 빌드
+```
+
+## 프로젝트 구조
+
+```
+lib/            앱 소스
+android/ ios/ web/ windows/ macos/ linux/   플랫폼별 러너
+test/           테스트
+```
+
+## 상태
+
+🚧 초기 개발 단계 — 기획/기술 명세 확정 후 구현 진행 중.
