@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "stores": [
+    { "id": "daiso-myeongdong",   "name": "다이소 명동역점",   "latitude": 37.560986, "longitude": 126.986072 },
+    { "id": "daiso-gangnam",      "name": "다이소 강남역점",   "latitude": 37.497942, "longitude": 127.027621 },
+    { "id": "daiso-hongdae",      "name": "다이소 홍대입구역점", "latitude": 37.556825, "longitude": 126.923607 },
+    { "id": "daiso-jamsil",       "name": "다이소 잠실점",     "latitude": 37.513272, "longitude": 127.100128 },
+    { "id": "daiso-yeouido",      "name": "다이소 여의도점",   "latitude": 37.521624, "longitude": 126.924191 },
+    { "id": "daiso-seolleung",    "name": "다이소 선릉역점",   "latitude": 37.504503, "longitude": 127.048963 },
+    { "id": "daiso-konkuk",       "name": "다이소 건대입구점", "latitude": 37.540398, "longitude": 127.069221 }
+  ]
+}
