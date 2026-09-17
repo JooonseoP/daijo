@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>다이저 — 인트로 & 홈 화면 청사진</title>
+<style>
+  :root {
+    --teal: #00897b;
+    --teal-dark: #00695c;
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --line: #e3e7ea;
+    --text: #1f2933;
+    --muted: #8b98a5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', 'Malgun Gothic', sans-serif; }
+  body { background: var(--bg); color: var(--text); padding: 32px 16px 64px; }
+  h1 { font-size: 20px; text-align: center; margin-bottom: 4px; }
+  .sub { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+  .stage { display: flex; gap: 34px; justify-content: center; flex-wrap: wrap; align-items: flex-start; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .caption { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+  .phone {
+    width: 290px; height: 600px; background: #000; border-radius: 34px;
+    padding: 10px; box-shadow: 0 12px 34px rgba(0,0,0,.22);
+  }
+  .screen {
+    width: 100%; height: 100%; background: var(--bg); border-radius: 26px;
+    overflow: hidden; display: flex; flex-direction: column; position: relative;
+  }
+
+  /* app bar */
+  .appbar {
+    background: var(--teal); color: #fff; padding: 14px 16px; font-size: 18px;
+    font-weight: 600; display: flex; align-items: center; gap: 8px;
+  }
+  .appbar .logo { font-size: 20px; }
+
+  /* input row */
+  .inputrow {
+    display: flex; align-items: center; gap: 8px; padding: 12px 14px;
+    background: var(--card); border-bottom: 1px solid var(--line);
+  }
+  .inputrow .field {
+    flex: 1; border: 1px solid var(--line); border-radius: 22px; padding: 10px 14px;
+    color: var(--muted); font-size: 14px; background: #fafbfc;
+  }
+  .inputrow .add {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--teal);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+
+  /* list */
+  .list { flex: 1; overflow-y: auto; padding: 6px 0; }
+  .item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    background: var(--card); border-bottom: 1px solid var(--line);
+  }
+  .check {
+    width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--teal);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 14px;
+  }
+  .check.on { background: var(--teal); }
+  .name { flex: 1; font-size: 15px; }
+  .stepper { display: flex; align-items: center; gap: 8px; }
+  .stepper button {
+    width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--line);
+    background: #fff; color: var(--teal); font-size: 16px; line-height: 1;
+  }
+  .qty { min-width: 16px; text-align: center; font-size: 14px; font-weight: 600; }
+  .item.done .name { color: var(--muted); text-decoration: line-through; }
+  .item.done { background: #f7f9fa; }
+  .divider {
+    padding: 6px 16px; font-size: 11px; color: var(--muted); letter-spacing: .3px;
+    text-transform: uppercase; background: var(--bg);
+  }
+  .versionbar {
+    text-align: center; font-size: 11px; color: var(--muted);
+    padding: 8px; background: var(--bg); border-top: 1px solid var(--line);
+  }
+
+  /* empty state */
+  .empty {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; color: var(--muted); gap: 14px; padding: 0 30px; text-align: center;
+  }
+  .empty .icon { font-size: 46px; opacity: .5; }
+  .empty .msg { font-size: 15px; line-height: 1.5; }
+
+  .swipe {
+    position: absolute; right: 0; top: 250px; height: 47px; width: 72px;
+    background: #e53935; color: #fff; display: flex; align-items: center;
+    justify-content: center; font-size: 12px; border-bottom: 1px solid var(--line);
+  }
+
+  /* intro / splash */
+  .intro {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 0 28px; text-align: center;
+    background: linear-gradient(160deg, var(--teal) 0%, var(--teal-dark) 100%); color: #fff;
+  }
+  .intro .logo-badge {
+    width: 104px; height: 104px; border-radius: 26px; background: rgba(255,255,255,.16);
+    border: 2px solid rgba(255,255,255,.5); display: flex; align-items: center;
+    justify-content: center; font-size: 46px; margin-bottom: 20px;
+  }
+  .intro .appname { font-size: 30px; font-weight: 700; letter-spacing: 1px; }
+  .intro .slogan { font-size: 13px; opacity: .85; margin-top: 6px; }
+  .intro .disclosure {
+    margin-top: 34px; background: rgba(0,0,0,.18); border-radius: 12px;
+    padding: 14px 16px; font-size: 12.5px; line-height: 1.65; text-align: left;
+  }
+  .intro .disclosure b { display: block; margin-bottom: 4px; font-size: 12px; opacity: .95; }
+  .intro .loading {
+    margin-top: 26px; display: flex; gap: 6px;
+  }
+  .intro .loading span {
+    width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.8);
+  }
+  .intro .company { position: absolute; bottom: 20px; font-size: 11px; opacity: .7; color:#fff; width:100%; left:0; text-align:center; }
+
+  .notes {
+    max-width: 760px; margin: 40px auto 0; background: var(--card);
+    border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px;
+  }
+  .notes h2 { font-size: 15px; margin: 14px 0 10px; color: var(--teal-dark); }
+  .notes h2:first-child { margin-top: 0; }
+  .notes ul { margin-left: 18px; }
+  .notes li { font-size: 13.5px; line-height: 1.8; }
+  .notes b { color: var(--text); }
+</style>
+</head>
+<body>
+  <h1>다이저 — 인트로 &amp; 홈 화면 청사진</h1>
+  <div class="sub">2026-09-17 · 인트로(스플래시) + 홈(목록 CRUD, 로컬 영구저장)</div>
+
+  <div class="stage">
+    <!-- Intro / Splash -->
+    <div class="col">
+      <div class="phone"><div class="screen">
+        <div class="intro">
+          <div class="logo-badge">🛒</div>
+          <div class="appname">다이저</div>
+          <div class="slogan">잊지 마세요, 문 앞에서 알려드릴게요</div>
+          <div class="disclosure">
+            <b>📍 위치 사용 안내</b>
+            다이저는 다이소 매장 근처에 도착하면 살 물건을 알려주기 위해, 앱을 사용하지 않는 동안에도
+            기기 위치를 백그라운드에서 확인합니다. 위치 정보는 기기에만 사용되며 외부로 전송되지 않습니다.
+          </div>
+          <div class="loading"><span></span><span></span><span></span></div>
+          <div class="company">ⓒ 2026 Joonseo</div>
+        </div>
+      </div></div>
+      <div class="caption">인트로 — 매 실행 스플래시 (~2초 후 자동 전환)</div>
+    </div>
+
+    <!-- Home: populated -->
+    <div class="col">
+      <div class="phone"><div class="screen">
+        <div class="appbar"><span class="logo">🛒</span> 다이저</div>
+        <div class="inputrow">
+          <div class="field">살 물건 입력…</div>
+          <div class="add">＋</div>
+        </div>
+        <div class="list">
+          <div class="item">
+            <div class="check"></div><div class="name">수세미</div>
+            <div class="stepper"><button>－</button><span class="qty">2</span><button>＋</button></div>
+          </div>
+          <div class="item">
+            <div class="check"></div><div class="name">건전지 AA</div>
+            <div class="stepper"><button>－</button><span class="qty">1</span><button>＋</button></div>
+          </div>
+          <div class="item">
+            <div class="check"></div><div class="name">물티슈</div>
+            <div class="stepper"><button>－</button><span class="qty">3</span><button>＋</button></div>
+          </div>
+          <div class="divider">완료</div>
+          <div class="item done">
+            <div class="check on">✓</div><div class="name">면봉</div>
+            <div class="stepper"><button>－</button><span class="qty">1</span><button>＋</button></div>
+          </div>
+        </div>
+        <div class="swipe">🗑 삭제</div>
+        <div class="versionbar">v1.0.0</div>
+      </div></div>
+      <div class="caption">홈 — 미완료 위 / 완료 하단, 하단 버전 표시</div>
+    </div>
+
+    <!-- Home: empty -->
+    <div class="col">
+      <div class="phone"><div class="screen">
+        <div class="appbar"><span class="logo">🛒</span> 다이저</div>
+        <div class="inputrow">
+          <div class="field">살 물건 입력…</div>
+          <div class="add">＋</div>
+        </div>
+        <div class="empty">
+          <div class="icon">📝</div>
+          <div class="msg">살 물건을 추가하세요.<br>매장 근처에 가면 알려드릴게요.</div>
+        </div>
+        <div class="versionbar">v1.0.0</div>
+      </div></div>
+      <div class="caption">홈 — 빈 상태</div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h2>인트로(스플래시) 페이지</h2>
+    <ul>
+      <li><b>노출</b> — 매 실행 시 표시, 약 1.5~2초 후 홈으로 자동 전환.</li>
+      <li><b>구성</b> — 앱/회사 로고(현재 자리표시자), 앱 이름 <b>다이저</b>, 슬로건, 하단 회사 표기.</li>
+      <li><b>위치 고지</b> — 백그라운드 위치 사용 목적을 문구로 <b>고지만</b> 한다(구글 플레이 사전 고지 충족). 실제 권한 요청·지오펜싱은 다음 페이지.</li>
+    </ul>
+    <h2>홈(쇼핑 목록) 페이지</h2>
+    <ul>
+      <li><b>추가</b> — 상단 인라인 입력줄에 이름 → 엔터/＋. 추가 후 입력줄 비워 연속 입력.</li>
+      <li><b>수정</b> — 항목 이름 탭 → 인라인 편집.</li>
+      <li><b>수량</b> — 각 행 스테퍼(－/＋), 기본 1. 1에서 －는 비활성.</li>
+      <li><b>완료</b> — 체크박스 탭 → 회색·취소선 후 "완료" 구분선 아래로 이동. 해제하면 위로.</li>
+      <li><b>삭제</b> — 왼쪽 스와이프(즉시 삭제, v1은 Undo 없음 — 후보로 기록).</li>
+      <li><b>정렬</b> — 미완료(등록순) → 완료(등록순).</li>
+      <li><b>버전 표시</b> — 화면 하단에 앱 버전(예: v1.0.0)을 작게 표시.</li>
+    </ul>
+  </div>
+</body>
+</html>
