@@ -20,41 +20,22 @@ final shoppingItemsProvider = StreamProvider<List<ShoppingItem>>((ref) {
 });
 
 class ShoppingListController {
-  ShoppingListController(this._repo, this._ref);
+  ShoppingListController(this._repo);
 
   final ShoppingItemRepository _repo;
-  final Ref _ref;
 
-  Future<void> add(String name) async {
-    if (name.trim().isEmpty) return;
-    await _repo.add(name);
-    _ref.invalidate(shoppingItemsProvider);
+  Future<void> add(String name) {
+    if (name.trim().isEmpty) return Future<void>.value();
+    return _repo.add(name);
   }
 
-  Future<void> rename(int id, String name) async {
-    await _repo.rename(id, name);
-    _ref.invalidate(shoppingItemsProvider);
-  }
-
-  Future<void> setQuantity(int id, int quantity) async {
-    await _repo.setQuantity(id, quantity);
-    _ref.invalidate(shoppingItemsProvider);
-  }
-
-  Future<void> toggleDone(int id, bool isDone) async {
-    await _repo.setDone(id, isDone);
-    _ref.invalidate(shoppingItemsProvider);
-  }
-
-  Future<void> delete(int id) async {
-    await _repo.delete(id);
-    _ref.invalidate(shoppingItemsProvider);
-  }
+  Future<void> rename(int id, String name) => _repo.rename(id, name);
+  Future<void> setQuantity(int id, int quantity) =>
+      _repo.setQuantity(id, quantity);
+  Future<void> toggleDone(int id, bool isDone) => _repo.setDone(id, isDone);
+  Future<void> delete(int id) => _repo.delete(id);
 }
 
 final shoppingListControllerProvider = Provider<ShoppingListController>(
-  (ref) => ShoppingListController(
-    ref.watch(shoppingItemRepositoryProvider),
-    ref,
-  ),
+  (ref) => ShoppingListController(ref.watch(shoppingItemRepositoryProvider)),
 );
