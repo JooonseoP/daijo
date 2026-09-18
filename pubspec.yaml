@@ -41,7 +41,11 @@ dependencies:
   flutter_local_notifications: ^19.5.0
   native_geofence: ^1.2.1
   geolocator: ^14.0.2
-  permission_handler: ^13.0.2
+  # Pinned to 11.x: permission_handler 12+/13+ pulls permission_handler_android 14.x,
+  # which requires AGP 9 / Kotlin 2.3 / Java 17 — ahead of this Flutter 3.29 toolchain
+  # (Gradle 8.10.2 / AGP 8.7.0 / Kotlin 1.8.22). 11.x supports background-location
+  # ("always") and notification permissions needed by the permissions page.
+  permission_handler: ^11.3.1
   package_info_plus: ^9.0.1
   path: ^1.9.1
 
