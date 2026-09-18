@@ -43,6 +43,7 @@ dependencies:
   geolocator: ^14.0.2
   permission_handler: ^13.0.2
   package_info_plus: ^9.0.1
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:
