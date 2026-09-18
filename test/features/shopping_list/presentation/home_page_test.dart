@@ -15,25 +15,31 @@ Widget _app(AppDatabase db) => ProviderScope(
       child: const MaterialApp(home: HomePage()),
     );
 
-/// HomePage watches [shoppingItemsProvider], a StreamProvider backed by Drift's
-/// live `.watch()`. That stream never lets `pumpAndSettle()` settle under
-/// FakeAsync (the real DB does async work the fake clock never advances), and at
-/// disposal Drift schedules a `Timer(Duration.zero)` that trips the pending-timer
-/// invariant. So we drive the UI with explicit bounded pumps and let any
-/// DB-affecting interaction run under [WidgetTester.runAsync] so the real stream
-/// can emit, then rebuild the widget with a plain pump outside runAsync.
+/// Waits for a Drift-backed stream emission, then rebuilds the widget.
+///
+/// Zone split: HomePage watches [shoppingItemsProvider], a StreamProvider backed
+/// by Drift's live `.watch()`. The DB does *real* (non-fake) async work, so we
+/// cross into the real-async zone via [WidgetTester.runAsync] to let that stream
+/// actually emit the new row set. Back in the fake zone, a plain `pump()` (no
+/// duration) rebuilds the tree with the fresh `AsyncData` without advancing the
+/// fake clock. Disposal-timer flushing is NOT this helper's concern — see
+/// [_teardown]. (`pumpAndSettle()` can't be used: the live `.watch()` stream
+/// never quiesces under FakeAsync.)
 Future<void> _flushStream(WidgetTester tester) async {
-  // Let the real (non-fake) async Drift stream emit, then rebuild the tree.
-  await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+  await tester
+      .runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
   await tester.pump();
-  await tester.pump(const Duration(milliseconds: 20));
+  await tester.pump();
 }
 
-/// Unmounts the ProviderScope so Drift's disposal `Timer(Duration.zero)` is
-/// scheduled, then advances the fake clock so that timer fires before the
-/// test's end-of-test `_verifyInvariants` pending-timer check runs. The
-/// disposal timer is created inside the FakeAsync zone, so it is cleared by
-/// pumping the fake clock forward — not by real async.
+/// Unmounts the ProviderScope and flushes Drift's disposal timer.
+///
+/// Zone split: unmounting triggers Drift's `StreamQueryStore.markAsClosed`, which
+/// schedules a `Timer(Duration.zero)` *inside the FakeAsync zone*. Real async
+/// (runAsync) can't clear a fake timer; only advancing the fake clock via
+/// `pump(duration)` fires it. We do that here so the timer is gone before the
+/// end-of-test `_verifyInvariants` pending-timer check runs. This is the ONLY
+/// place the fake clock is advanced — the per-mutation stream flush must not.
 Future<void> _teardown(WidgetTester tester) async {
   await tester.pumpWidget(const SizedBox());
   // Fire Drift's zero-duration disposal timer on the fake clock.
@@ -47,47 +53,51 @@ void main() {
   tearDown(() => db.close());
 
   testWidgets('shows empty-state message and version footer', (tester) async {
-    await tester.pumpWidget(_app(db));
-    await _flushStream(tester);
+    // `finally` runs the disposal-timer flush unconditionally — even if an
+    // assertion throws — so no live disposal timer leaks past this test. It
+    // must run inside the test body (before the end-of-test pending-timer
+    // invariant), which is why we don't use `addTearDown` here.
+    try {
+      await tester.pumpWidget(_app(db));
+      await _flushStream(tester);
 
-    expect(find.textContaining('살 물건을 추가하세요'), findsOneWidget);
-    expect(find.text('v1.0.0'), findsOneWidget);
-
-    await _teardown(tester);
+      expect(find.textContaining('살 물건을 추가하세요'), findsOneWidget);
+      expect(find.text('v1.0.0'), findsOneWidget);
+    } finally {
+      await _teardown(tester);
+    }
   });
 
   testWidgets('adding via the field shows the item', (tester) async {
-    await tester.pumpWidget(_app(db));
-    await _flushStream(tester);
+    try {
+      await tester.pumpWidget(_app(db));
+      await _flushStream(tester);
 
-    await tester.runAsync(() async {
       await tester.enterText(find.byType(TextField), '수세미');
       await tester.testTextInput.receiveAction(TextInputAction.done);
-    });
-    await _flushStream(tester);
+      await _flushStream(tester);
 
-    expect(find.text('수세미'), findsOneWidget);
-
-    await _teardown(tester);
+      expect(find.text('수세미'), findsOneWidget);
+    } finally {
+      await _teardown(tester);
+    }
   });
 
   testWidgets('completing an item shows the 완료 divider', (tester) async {
-    await tester.pumpWidget(_app(db));
-    await _flushStream(tester);
+    try {
+      await tester.pumpWidget(_app(db));
+      await _flushStream(tester);
 
-    await tester.runAsync(() async {
       await tester.enterText(find.byType(TextField), '건전지');
       await tester.testTextInput.receiveAction(TextInputAction.done);
-    });
-    await _flushStream(tester);
+      await _flushStream(tester);
 
-    await tester.runAsync(() async {
       await tester.tap(find.byType(Checkbox).first);
-    });
-    await _flushStream(tester);
+      await _flushStream(tester);
 
-    expect(find.text('완료'), findsOneWidget);
-
-    await _teardown(tester);
+      expect(find.text('완료'), findsOneWidget);
+    } finally {
+      await _teardown(tester);
+    }
   });
 }
