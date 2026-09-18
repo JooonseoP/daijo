@@ -11,6 +11,7 @@ class ShoppingItemLocalDataSource {
           ..orderBy([
             (t) => OrderingTerm(expression: t.isDone),
             (t) => OrderingTerm(expression: t.createdAt),
+            (t) => OrderingTerm(expression: t.id),
           ]))
         .watch();
   }

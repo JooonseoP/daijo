@@ -50,4 +50,18 @@ void main() {
     await ds.deleteById(id);
     expect(await ds.watchAll().first, isEmpty);
   });
+
+  test('watchAll orders by id when createdAt is identical', () async {
+    final sameTime = DateTime(2026, 1, 1);
+    final idA = await db.into(db.shoppingItems).insert(
+          ShoppingItemsCompanion.insert(name: 'A', createdAt: sameTime),
+        );
+    final idB = await db.into(db.shoppingItems).insert(
+          ShoppingItemsCompanion.insert(name: 'B', createdAt: sameTime),
+        );
+
+    final rows = await ds.watchAll().first;
+    final ids = rows.map((r) => r.id).toList();
+    expect(ids, [idA, idB]); // ascending id when createdAt ties
+  });
 }

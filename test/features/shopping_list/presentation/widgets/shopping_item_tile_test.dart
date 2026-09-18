@@ -84,6 +84,39 @@ void main() {
     expect(deleted, isTrue);
   });
 
+  testWidgets('minus at qty 2 fires onQuantityChanged with 1', (tester) async {
+    final quantities = <int>[];
+    await tester.pumpWidget(_host(ShoppingItemTile(
+      item: _item(qty: 2),
+      onToggleDone: (_) {},
+      onRename: (_) {},
+      onQuantityChanged: quantities.add,
+      onDelete: () {},
+    )));
+
+    await tester.tap(find.byKey(const ValueKey('minus-1')));
+    await tester.pump();
+    expect(quantities, [1]);
+  });
+
+  testWidgets('submitting same name does not fire onRename', (tester) async {
+    final renamed = <String>[];
+    await tester.pumpWidget(_host(ShoppingItemTile(
+      item: _item(),
+      onToggleDone: (_) {},
+      onRename: renamed.add,
+      onQuantityChanged: (_) {},
+      onDelete: () {},
+    )));
+
+    await tester.tap(find.text('수세미'));
+    await tester.pump();
+    await tester.enterText(find.byType(TextField), '수세미');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+    expect(renamed, isEmpty);
+  });
+
   testWidgets(
       'edit controller reflects renamed item after parent rebuild (not mid-edit)',
       (tester) async {
