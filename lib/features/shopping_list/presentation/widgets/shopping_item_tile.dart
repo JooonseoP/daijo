@@ -27,6 +27,14 @@ class _ShoppingItemTileState extends State<ShoppingItemTile> {
       TextEditingController(text: widget.item.name);
 
   @override
+  void didUpdateWidget(ShoppingItemTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_editing && oldWidget.item.name != widget.item.name) {
+      _controller.text = widget.item.name;
+    }
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();

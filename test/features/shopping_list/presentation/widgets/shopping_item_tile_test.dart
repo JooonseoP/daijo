@@ -83,4 +83,46 @@ void main() {
     await tester.pumpAndSettle();
     expect(deleted, isTrue);
   });
+
+  testWidgets(
+      'edit controller reflects renamed item after parent rebuild (not mid-edit)',
+      (tester) async {
+    final original = ShoppingItem(
+      id: 1,
+      name: '수세미',
+      quantity: 1,
+      isDone: false,
+      createdAt: DateTime(2026),
+    );
+    final renamed = ShoppingItem(
+      id: 1,
+      name: '철수세미',
+      quantity: 1,
+      isDone: false,
+      createdAt: DateTime(2026),
+    );
+
+    // Pump with original item name.
+    await tester.pumpWidget(_host(ShoppingItemTile(
+      item: original,
+      onToggleDone: (_) {},
+      onRename: (_) {},
+      onQuantityChanged: (_) {},
+      onDelete: () {},
+    )));
+
+    // Parent rebuilds with a new item whose name changed.
+    await tester.pumpWidget(_host(ShoppingItemTile(
+      item: renamed,
+      onToggleDone: (_) {},
+      onRename: (_) {},
+      onQuantityChanged: (_) {},
+      onDelete: () {},
+    )));
+
+    // Tap name to enter edit mode — TextField should be pre-filled with new name.
+    await tester.tap(find.text('철수세미'));
+    await tester.pump();
+    expect(find.widgetWithText(TextField, '철수세미'), findsOneWidget);
+  });
 }
