@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'features/intro/presentation/intro_page.dart';
+import 'features/onboarding/presentation/splash_gate.dart';
 
 class DaijoApp extends StatelessWidget {
   const DaijoApp({super.key});
@@ -13,7 +13,7 @@ class DaijoApp extends StatelessWidget {
         colorSchemeSeed: const Color(0xFF00897B),
         useMaterial3: true,
       ),
-      home: const IntroPage(),
+      home: const SplashGate(),
     );
   }
 }
