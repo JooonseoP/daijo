@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/entities/shopping_item.dart';
+import '../../onboarding/presentation/onboarding_page.dart';
 import 'app_version_provider.dart';
+import 'permission_status_provider.dart';
 import 'shopping_list_providers.dart';
 import 'widgets/add_item_field.dart';
+import 'widgets/permission_banner.dart';
 import 'widgets/shopping_item_tile.dart';
 
 class HomePage extends ConsumerWidget {
@@ -23,6 +26,18 @@ class HomePage extends ConsumerWidget {
       appBar: AppBar(title: const Text('다이저')),
       body: Column(
         children: [
+          ref.watch(permissionSummaryProvider).maybeWhen(
+                data: (s) => s.geofencingReady
+                    ? const SizedBox.shrink()
+                    : PermissionBanner(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const OnboardingPage(),
+                          ),
+                        ),
+                      ),
+                orElse: () => const SizedBox.shrink(),
+              ),
           AddItemField(onSubmit: controller.add),
           Expanded(
             child: itemsAsync.when(

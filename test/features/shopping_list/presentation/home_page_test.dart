@@ -3,14 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:daijo/core/database/app_database.dart';
+import 'package:daijo/core/permissions/permission_providers.dart';
+import 'package:daijo/core/permissions/permission_service.dart';
 import 'package:daijo/features/shopping_list/presentation/app_version_provider.dart';
 import 'package:daijo/features/shopping_list/presentation/home_page.dart';
 import 'package:daijo/features/shopping_list/presentation/shopping_list_providers.dart';
+
+/// Fake PermissionService that returns [PermissionStatus.granted] for every
+/// kind so that [permissionSummaryProvider] resolves to geofencingReady=true
+/// and NO banner is shown — keeping existing assertions valid.
+class _GrantedPermissionService implements PermissionService {
+  const _GrantedPermissionService();
+
+  @override
+  Future<PermissionStatus> check(PermissionKind kind) async =>
+      PermissionStatus.granted;
+
+  @override
+  Future<PermissionStatus> request(PermissionKind kind) async =>
+      PermissionStatus.granted;
+
+  @override
+  Future<void> openAppSettings() async {}
+}
 
 Widget _app(AppDatabase db) => ProviderScope(
       overrides: [
         appDatabaseProvider.overrideWithValue(db),
         appVersionProvider.overrideWith((ref) async => '1.0.0'),
+        permissionServiceProvider
+            .overrideWithValue(const _GrantedPermissionService()),
       ],
       child: const MaterialApp(home: HomePage()),
     );
