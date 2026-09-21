@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart' as ph;
 
 import 'permission_service.dart';
@@ -25,16 +26,30 @@ class PermissionHandlerService implements PermissionService {
 
   @override
   Future<PermissionStatus> check(PermissionKind kind) async {
-    return _status(await _map(kind).status);
+    try {
+      return _status(await _map(kind).status);
+    } catch (e) {
+      debugPrint('[PermissionHandlerService] check($kind) failed: $e');
+      return PermissionStatus.denied;
+    }
   }
 
   @override
   Future<PermissionStatus> request(PermissionKind kind) async {
-    return _status(await _map(kind).request());
+    try {
+      return _status(await _map(kind).request());
+    } catch (e) {
+      debugPrint('[PermissionHandlerService] request($kind) failed: $e');
+      return PermissionStatus.denied;
+    }
   }
 
   @override
   Future<void> openAppSettings() async {
-    await ph.openAppSettings();
+    try {
+      await ph.openAppSettings();
+    } catch (e) {
+      debugPrint('[PermissionHandlerService] openAppSettings() failed: $e');
+    }
   }
 }

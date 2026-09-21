@@ -7,7 +7,9 @@ import 'package:daijo/core/permissions/permission_providers.dart';
 import 'package:daijo/core/permissions/permission_service.dart';
 import 'package:daijo/features/shopping_list/presentation/app_version_provider.dart';
 import 'package:daijo/features/shopping_list/presentation/home_page.dart';
+import 'package:daijo/features/shopping_list/presentation/permission_status_provider.dart';
 import 'package:daijo/features/shopping_list/presentation/shopping_list_providers.dart';
+import 'package:daijo/features/shopping_list/presentation/widgets/permission_banner.dart';
 
 /// Fake PermissionService that returns [PermissionStatus.granted] for every
 /// kind so that [permissionSummaryProvider] resolves to geofencingReady=true
@@ -22,6 +24,23 @@ class _GrantedPermissionService implements PermissionService {
   @override
   Future<PermissionStatus> request(PermissionKind kind) async =>
       PermissionStatus.granted;
+
+  @override
+  Future<void> openAppSettings() async {}
+}
+
+/// Mutable fake whose [check] return value can be changed at runtime.
+/// Used to simulate the user granting permissions after the banner is shown.
+class _MutablePermissionService implements PermissionService {
+  PermissionStatus status;
+
+  _MutablePermissionService(this.status);
+
+  @override
+  Future<PermissionStatus> check(PermissionKind kind) async => status;
+
+  @override
+  Future<PermissionStatus> request(PermissionKind kind) async => status;
 
   @override
   Future<void> openAppSettings() async {}
@@ -118,6 +137,52 @@ void main() {
       await _flushStream(tester);
 
       expect(find.text('완료'), findsOneWidget);
+    } finally {
+      await _teardown(tester);
+    }
+  });
+
+  testWidgets('banner clears after permissionSummaryProvider is invalidated '
+      'with granted status', (tester) async {
+    // Arrange: mutable service that starts DENIED so banner appears.
+    final fakeSvc = _MutablePermissionService(PermissionStatus.denied);
+
+    // We need a ProviderContainer we can access to call invalidate after
+    // flipping the fake. Wrap in a UncontrolledProviderScope so we own the
+    // container's lifecycle.
+    final container = ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(db),
+        appVersionProvider.overrideWith((ref) async => '1.0.0'),
+        permissionServiceProvider.overrideWithValue(fakeSvc),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    try {
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(home: HomePage()),
+        ),
+      );
+      await _flushStream(tester);
+
+      // Banner must be visible while permissions are denied.
+      expect(find.byType(PermissionBanner), findsOneWidget);
+
+      // Simulate user granting all permissions (both locationAlways and
+      // notification must be granted for geofencingReady == true).
+      fakeSvc.status = PermissionStatus.granted;
+
+      // Invalidate the cached summary so the FutureProvider re-runs with
+      // the new service state (this is exactly what the onFinished callback
+      // in home_page.dart does via ref.invalidate).
+      container.invalidate(permissionSummaryProvider);
+      await _flushStream(tester);
+
+      // Banner must be gone.
+      expect(find.byType(PermissionBanner), findsNothing);
     } finally {
       await _teardown(tester);
     }

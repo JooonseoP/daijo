@@ -30,11 +30,19 @@ class HomePage extends ConsumerWidget {
                 data: (s) => s.geofencingReady
                     ? const SizedBox.shrink()
                     : PermissionBanner(
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => const OnboardingPage(),
-                          ),
-                        ),
+                        onTap: () {
+                          final nav = Navigator.of(context);
+                          nav.push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => OnboardingPage(
+                                onFinished: () {
+                                  ref.invalidate(permissionSummaryProvider);
+                                  nav.pop();
+                                },
+                              ),
+                            ),
+                          );
+                        },
                       ),
                 orElse: () => const SizedBox.shrink(),
               ),
