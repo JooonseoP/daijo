@@ -27,6 +27,13 @@ void main() {
       ).geofencingReady,
       isFalse,
     );
+    expect(
+      const PermissionSummary(
+        always: PermissionStatus.granted,
+        notification: PermissionStatus.denied,
+      ).geofencingReady,
+      isFalse,
+    );
   });
 
   testWidgets('banner renders message and fires onTap', (t) async {
