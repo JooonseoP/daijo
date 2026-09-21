@@ -8,6 +8,8 @@ import 'package:path_provider/path_provider.dart';
 
 import 'app.dart';
 import 'core/database/app_database.dart';
+import 'core/permissions/permission_providers.dart';
+import 'core/permissions/permission_service_impl.dart';
 import 'features/shopping_list/presentation/shopping_list_providers.dart';
 
 Future<AppDatabase> openAppDatabase() async {
@@ -22,7 +24,12 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
-      overrides: [appDatabaseProvider.overrideWithValue(db)],
+      overrides: [
+        appDatabaseProvider.overrideWithValue(db),
+        permissionServiceProvider.overrideWithValue(
+          const PermissionHandlerService(),
+        ),
+      ],
       child: const DaijoApp(),
     ),
   );
