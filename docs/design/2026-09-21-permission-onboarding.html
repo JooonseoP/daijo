@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>다이저 — 권한 온보딩 청사진</title>
+<style>
+  :root {
+    --teal: #00897B;
+    --teal-dark: #00695C;
+    --bg: #eceff1;
+    --card: #ffffff;
+    --ink: #1f2933;
+    --muted: #6b7884;
+    --line: #e0e4e8;
+    --amber-bg: #fff8e1;
+    --amber-line: #ffe082;
+    --amber-ink: #8a6d00;
+    --green: #2e7d32;
+    --green-bg: #e8f5e9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", "Malgun Gothic", system-ui, sans-serif;
+    padding: 32px 16px 64px;
+  }
+  h1 { text-align: center; font-size: 20px; margin: 0 0 4px; }
+  .sub { text-align: center; color: var(--muted); font-size: 13px; margin: 0 0 28px; }
+  .stage {
+    display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; align-items: flex-start;
+  }
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .frame-label { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+  .phone {
+    width: 300px; height: 620px; background: var(--card);
+    border-radius: 34px; border: 10px solid #263238;
+    overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,.18);
+    display: flex; flex-direction: column;
+  }
+  .statusbar { height: 26px; background: var(--teal-dark); }
+  .screen { flex: 1; overflow-y: auto; }
+
+  /* Onboarding */
+  .ob-head { background: var(--teal); color: #fff; padding: 22px 20px 20px; }
+  .ob-head .icon { font-size: 30px; }
+  .ob-head h2 { font-size: 18px; margin: 10px 0 6px; font-weight: 700; }
+  .ob-head p { font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,.85); margin: 0; }
+  .steps { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+
+  .card {
+    border: 1px solid var(--line); border-radius: 14px; padding: 14px;
+    display: flex; gap: 12px; align-items: flex-start; background: #fff;
+  }
+  .card .ci { font-size: 20px; width: 26px; text-align: center; }
+  .card .body { flex: 1; }
+  .card .t { font-size: 14px; font-weight: 700; margin: 0 0 3px; display:flex; align-items:center; gap:6px; }
+  .card .d { font-size: 11.5px; color: var(--muted); line-height: 1.45; margin: 0; }
+  .disclosure {
+    margin-top: 8px; font-size: 11px; line-height: 1.5;
+    background: var(--amber-bg); border: 1px solid var(--amber-line);
+    color: var(--amber-ink); border-radius: 8px; padding: 8px 10px;
+  }
+  .action { margin-top: 10px; }
+  .btn {
+    display: inline-block; border: none; cursor: default;
+    font-size: 12.5px; font-weight: 600; padding: 7px 14px; border-radius: 8px;
+  }
+  .btn.primary { background: var(--teal); color: #fff; }
+  .btn.ghost { background: #eef2f3; color: var(--teal-dark); }
+  .pill {
+    font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+  }
+  .pill.done { background: var(--green-bg); color: var(--green); }
+  .pill.locked { background: #eceff1; color: #90a4ae; }
+  .card.locked { opacity: .55; }
+  .card.done { border-color: #c8e6c9; background: #fafffb; }
+
+  .ob-foot { padding: 8px 16px 18px; }
+  .cta {
+    width: 100%; text-align: center; background: var(--teal); color: #fff;
+    font-size: 15px; font-weight: 700; padding: 13px; border-radius: 12px; border: none;
+  }
+  .skip { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 12px; text-decoration: underline; }
+  .foot-note { text-align:center; color: var(--muted); font-size: 11px; margin-top: 10px; }
+
+  /* Home */
+  .appbar { background: var(--teal); color: #fff; padding: 14px 16px; font-weight: 700; font-size: 16px; }
+  .banner {
+    margin: 12px; background: var(--amber-bg); border: 1px solid var(--amber-line);
+    border-radius: 12px; padding: 12px; display: flex; gap: 10px; align-items: flex-start;
+  }
+  .banner .bi { font-size: 18px; }
+  .banner .bt { font-size: 12.5px; color: var(--amber-ink); line-height: 1.45; flex: 1; }
+  .banner .bt b { display: block; margin-bottom: 2px; }
+  .banner .ba { font-size: 12px; font-weight: 700; color: var(--teal-dark); white-space: nowrap; }
+  .list-item {
+    margin: 0 12px; padding: 14px 4px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 12px; font-size: 14px;
+  }
+  .checkbox { width: 20px; height: 20px; border: 2px solid #cfd8dc; border-radius: 6px; }
+  .addbar {
+    margin: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px;
+    color: var(--muted); font-size: 13px; display: flex; justify-content: space-between;
+  }
+  .legend { max-width: 640px; margin: 34px auto 0; font-size: 12.5px; color: #475059; line-height: 1.7; }
+  .legend b { color: var(--ink); }
+  code { background:#e3e8ea; padding:1px 5px; border-radius:4px; font-size:11.5px; }
+</style>
+</head>
+<body>
+  <h1>다이저 — 권한 온보딩 화면 청사진</h1>
+  <p class="sub">2026-09-21 · 단일 화면 · 순차 권한 카드 · 논블로킹(언제든 건너뛰기) · 첫 실행 게이트</p>
+
+  <div class="stage">
+
+    <!-- Onboarding screen -->
+    <div class="frame-wrap">
+      <div class="frame-label">① 권한 온보딩 (첫 실행)</div>
+      <div class="phone">
+        <div class="statusbar"></div>
+        <div class="screen">
+          <div class="ob-head">
+            <div class="icon">📍🔔</div>
+            <h2>문 앞에서 알려드릴게요</h2>
+            <p>다이소 매장 근처에 도착하면 살 물건을 알림으로 보여드려요. 이를 위해 아래 권한이 필요해요.</p>
+          </div>
+
+          <div class="steps">
+            <!-- Step 1: foreground location - granted -->
+            <div class="card done">
+              <div class="ci">📍</div>
+              <div class="body">
+                <p class="t">위치 (앱 사용 중) <span class="pill done">허용됨 ✓</span></p>
+                <p class="d">가까운 다이소 매장을 찾기 위해 현재 위치를 사용해요.</p>
+              </div>
+            </div>
+
+            <!-- Step 2: background location - pending, with disclosure -->
+            <div class="card">
+              <div class="ci">🛰️</div>
+              <div class="body">
+                <p class="t">위치 항상 허용</p>
+                <p class="d">앱을 켜지 않아도 매장 근처 진입을 감지하려면 필요해요.</p>
+                <div class="disclosure">
+                  다이저는 매장 근처 알림을 위해 <b>백그라운드에서 기기 위치를 확인</b>합니다.
+                  위치는 기기에만 사용되며 외부로 전송되지 않습니다.<br/>
+                  · Android에서는 설정 화면에서 <b>"항상 허용"</b>을 직접 선택해야 해요.
+                </div>
+                <div class="action"><span class="btn primary">설정에서 허용</span></div>
+              </div>
+            </div>
+
+            <!-- Step 3: notification - pending -->
+            <div class="card">
+              <div class="ci">🔔</div>
+              <div class="body">
+                <p class="t">알림</p>
+                <p class="d">매장 근처에서 쇼핑 목록을 알림으로 보여주기 위해 필요해요.</p>
+                <div class="action"><span class="btn primary">허용</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ob-foot">
+            <button class="cta">시작하기</button>
+            <div class="skip">권한 없이 목록만 사용할게요</div>
+            <div class="foot-note">권한은 나중에 홈 화면에서 다시 켤 수 있어요.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onboarding: locked variant -->
+    <div class="frame-wrap">
+      <div class="frame-label">①-b 순차 잠금 상태 (초기 진입)</div>
+      <div class="phone">
+        <div class="statusbar"></div>
+        <div class="screen">
+          <div class="ob-head">
+            <div class="icon">📍🔔</div>
+            <h2>문 앞에서 알려드릴게요</h2>
+            <p>아래 권한을 위에서부터 순서대로 허용해 주세요.</p>
+          </div>
+          <div class="steps">
+            <div class="card">
+              <div class="ci">📍</div>
+              <div class="body">
+                <p class="t">위치 (앱 사용 중)</p>
+                <p class="d">가까운 다이소 매장을 찾기 위해 현재 위치를 사용해요.</p>
+                <div class="action"><span class="btn primary">허용</span></div>
+              </div>
+            </div>
+            <div class="card locked">
+              <div class="ci">🛰️</div>
+              <div class="body">
+                <p class="t">위치 항상 허용 <span class="pill locked">🔒 잠김</span></p>
+                <p class="d">먼저 위의 "앱 사용 중" 위치를 허용하면 열려요.</p>
+              </div>
+            </div>
+            <div class="card locked">
+              <div class="ci">🔔</div>
+              <div class="body">
+                <p class="t">알림 <span class="pill locked">🔒 잠김</span></p>
+                <p class="d">위치 권한을 먼저 설정한 뒤 요청해요.</p>
+              </div>
+            </div>
+          </div>
+          <div class="ob-foot">
+            <button class="cta">시작하기</button>
+            <div class="skip">권한 없이 목록만 사용할게요</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Home with banner -->
+    <div class="frame-wrap">
+      <div class="frame-label">② 홈 — 권한 부족 배너</div>
+      <div class="phone">
+        <div class="statusbar"></div>
+        <div class="screen">
+          <div class="appbar">다이저</div>
+          <div class="banner">
+            <div class="bi">⚠️</div>
+            <div class="bt"><b>매장 근처 알림이 꺼져 있어요</b>위치 "항상 허용"과 알림 권한이 필요해요.</div>
+            <div class="ba">권한 켜기 ›</div>
+          </div>
+          <div class="addbar"><span>살 물건 추가…</span><span>＋</span></div>
+          <div class="list-item"><span class="checkbox"></span><span>물티슈 ×2</span></div>
+          <div class="list-item"><span class="checkbox"></span><span>수세미</span></div>
+          <div class="list-item"><span class="checkbox"></span><span>건전지 AA ×4</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="legend">
+    <b>흐름</b> — 인트로 스플래시 → (<code>onboardingCompleted=false</code>면) 온보딩 → 홈. "시작하기"/건너뛰기 모두 완료 플래그를 저장하고 홈으로 이동. 이후 실행은 홈 직행.<br/>
+    <b>순차 게이팅</b> — <code>위치 항상 허용</code> 카드는 <code>위치(앱 사용 중)</code> 허용 전까지 잠김(①-b). Android 11+에서 "항상 허용"은 시스템 설정으로 딥링크되므로 버튼 문구가 "설정에서 허용".<br/>
+    <b>거부 처리</b> — 영구 거부 시 버튼이 "설정 열기"로 바뀜. 권한 없이도 목록 앱으로 계속 사용 가능.<br/>
+    <b>홈 배너</b> — 위치 항상 허용 또는 알림 권한이 없으면 표시. 탭하면 재요청/설정 이동으로 온보딩 재진입 경로를 완결.
+  </div>
+</body>
+</html>
