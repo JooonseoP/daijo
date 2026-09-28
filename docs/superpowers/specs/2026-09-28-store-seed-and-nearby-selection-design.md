@@ -38,6 +38,7 @@ API에 원(圓)들을 등록**하고, OS가 저전력 센서 융합·움직임 �
 ## 이번 사이클(슬라이스 A)의 범위
 
 - `assets/data/daiso_stores.json`(전국 1,710개) → **버전 플래그 기반 1회 DB 적재**.
+  (기존 테스트용 `assets/data/stores_seed.json`은 삭제, pubspec 에셋도 교체.)
 - `Store` 도메인 모델 + Drift `Stores` 테이블(+ schemaVersion 3 마이그레이션).
 - **가까운 20개 선별 + 경계 반경 계산**(Haversine, 순수 로직).
 - 위치 취득은 `LocationService` **인터페이스만 정의**(실구현은 슬라이스 C).
@@ -62,7 +63,7 @@ API에 원(圓)들을 등록**하고, OS가 저전력 센서 융합·움직임 �
 | 경계 반경 | 20번째(가장 먼 선택) 매장까지 거리. 마진 없음(YAGNI) |
 | 갱신 방식 | (주) 경계 지오펜스 EXIT 재무장(이벤트) + (보조) 저빈도 재등록 안전망 — 배선은 B/C |
 | `Store` 필드 | `id`(String)·`name`·`latitude`·`longitude`·`radius`(적재 시 150m). address/phone 버림 |
-| 매장 데이터 | 크롤링한 전국 실데이터 `daiso_stores.json` 채택. 테스트는 소수 고정 픽스처 |
+| 매장 데이터 | 크롤링한 전국 실데이터 `daiso_stores.json` 채택. 기존 `stores_seed.json`은 삭제. 테스트는 인라인 소수 고정 픽스처 사용 |
 | 상수 | `N=20`, 기본 반경 `150m`, 지구 반경 `6371000m` |
 
 ## 아키텍처 (Clean Architecture · feature-first)

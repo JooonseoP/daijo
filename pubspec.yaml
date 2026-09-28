@@ -74,7 +74,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/data/stores_seed.json
+    - assets/data/daiso_stores.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:
