@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/shopping_item.dart';
 
+enum _TileAction { rename, delete }
+
 class ShoppingItemTile extends StatefulWidget {
   const ShoppingItemTile({
     super.key,
@@ -76,6 +78,7 @@ class _ShoppingItemTileState extends State<ShoppingItemTile> {
                 onTapOutside: (_) => _submitRename(),
               )
             : GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () => setState(() => _editing = true),
                 child: Text(
                   item.name,
@@ -102,6 +105,27 @@ class _ShoppingItemTileState extends State<ShoppingItemTile> {
               key: ValueKey('plus-${item.id}'),
               onPressed: () => widget.onQuantityChanged(item.quantity + 1),
               icon: const Icon(Icons.add),
+            ),
+            PopupMenuButton<_TileAction>(
+              key: ValueKey('menu-${item.id}'),
+              onSelected: (action) {
+                switch (action) {
+                  case _TileAction.rename:
+                    setState(() => _editing = true);
+                  case _TileAction.delete:
+                    widget.onDelete();
+                }
+              },
+              itemBuilder: (_) => const [
+                PopupMenuItem(
+                  value: _TileAction.rename,
+                  child: Text('이름 수정'),
+                ),
+                PopupMenuItem(
+                  value: _TileAction.delete,
+                  child: Text('삭제'),
+                ),
+              ],
             ),
           ],
         ),

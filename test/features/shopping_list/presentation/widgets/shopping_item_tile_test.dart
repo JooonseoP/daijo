@@ -84,6 +84,39 @@ void main() {
     expect(deleted, isTrue);
   });
 
+  testWidgets('overflow menu 삭제 reports delete', (tester) async {
+    var deleted = false;
+    await tester.pumpWidget(_host(ShoppingItemTile(
+      item: _item(),
+      onToggleDone: (_) {},
+      onRename: (_) {},
+      onQuantityChanged: (_) {},
+      onDelete: () => deleted = true,
+    )));
+
+    await tester.tap(find.byKey(const ValueKey('menu-1')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('삭제'));
+    await tester.pumpAndSettle();
+    expect(deleted, isTrue);
+  });
+
+  testWidgets('overflow menu 이름 수정 shows editable field', (tester) async {
+    await tester.pumpWidget(_host(ShoppingItemTile(
+      item: _item(),
+      onToggleDone: (_) {},
+      onRename: (_) {},
+      onQuantityChanged: (_) {},
+      onDelete: () {},
+    )));
+
+    await tester.tap(find.byKey(const ValueKey('menu-1')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('이름 수정'));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsOneWidget);
+  });
+
   testWidgets('minus at qty 2 fires onQuantityChanged with 1', (tester) async {
     final quantities = <int>[];
     await tester.pumpWidget(_host(ShoppingItemTile(
