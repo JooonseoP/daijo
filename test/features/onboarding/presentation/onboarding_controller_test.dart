@@ -86,4 +86,23 @@ void main() {
     final prefs = container.read(onboardingPreferencesProvider);
     expect(await prefs.isCompleted(), isTrue);
   });
+
+  test('requestNotification opens settings when request stays non-granted',
+      () async {
+    // Android will not re-prompt a decided notification permission: request()
+    // returns denied without a dialog, so we must route the user to settings.
+    svc.requestResult[PermissionKind.notification] = PermissionStatus.denied;
+    await controller().requestNotification();
+    expect(svc.openSettingsCount, 1);
+    expect(container.read(onboardingControllerProvider).notification,
+        PermissionStatus.denied);
+  });
+
+  test('requestNotification does not open settings when granted', () async {
+    svc.requestResult[PermissionKind.notification] = PermissionStatus.granted;
+    await controller().requestNotification();
+    expect(svc.openSettingsCount, 0);
+    expect(container.read(onboardingControllerProvider).notification,
+        PermissionStatus.granted);
+  });
 }

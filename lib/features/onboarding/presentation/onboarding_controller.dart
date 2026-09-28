@@ -63,6 +63,12 @@ class OnboardingController extends StateNotifier<OnboardingState> {
 
   Future<void> requestNotification() async {
     final status = await _permissions.request(PermissionKind.notification);
+    // Android will not re-prompt a notification permission the user already
+    // decided (e.g. granted then revoked in settings): request() returns denied
+    // without a dialog. Route to app settings so re-enabling is possible.
+    if (status != PermissionStatus.granted) {
+      await _permissions.openAppSettings();
+    }
     state = state.copyWith(notification: status);
   }
 
