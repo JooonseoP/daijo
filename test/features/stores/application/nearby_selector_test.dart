@@ -44,4 +44,10 @@ void main() {
     expect(result.stores, isEmpty);
     expect(result.boundaryRadiusMeters, 0);
   });
+
+  test('n of zero yields empty selection with zero radius', () {
+    final result = NearbySelector.select(center, [_s('a', 0, 1)], n: 0);
+    expect(result.stores, isEmpty);
+    expect(result.boundaryRadiusMeters, 0);
+  });
 }

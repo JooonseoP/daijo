@@ -39,6 +39,9 @@ abstract final class NearbySelector {
         return byDistance != 0 ? byDistance : a.store.id.compareTo(b.store.id);
       });
     final selected = withDistance.take(n).toList();
+    if (selected.isEmpty) {
+      return GeofenceSelection(center: center, stores: const [], boundaryRadiusMeters: 0);
+    }
     return GeofenceSelection(
       center: center,
       stores: selected.map((e) => e.store).toList(),
