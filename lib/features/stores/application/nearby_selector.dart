@@ -1,8 +1,11 @@
 import 'dart:math' as math;
 
 import '../../../core/location/location_service.dart';
+import '../domain/entities/geofence_selection.dart';
+import '../domain/entities/store.dart';
 
 const double kEarthRadiusMeters = 6371000.0;
+const int kNearbyStoreCount = 20;
 
 double haversineMeters(LatLng a, LatLng b) {
   final lat1 = _toRad(a.latitude);
@@ -15,3 +18,31 @@ double haversineMeters(LatLng a, LatLng b) {
 }
 
 double _toRad(double deg) => deg * math.pi / 180.0;
+
+abstract final class NearbySelector {
+  static GeofenceSelection select(
+    LatLng center,
+    List<Store> stores, {
+    int n = kNearbyStoreCount,
+  }) {
+    if (stores.isEmpty) {
+      return GeofenceSelection(center: center, stores: const [], boundaryRadiusMeters: 0);
+    }
+    final withDistance = stores
+        .map((s) => (
+              store: s,
+              distance: haversineMeters(center, LatLng(s.latitude, s.longitude)),
+            ))
+        .toList()
+      ..sort((a, b) {
+        final byDistance = a.distance.compareTo(b.distance);
+        return byDistance != 0 ? byDistance : a.store.id.compareTo(b.store.id);
+      });
+    final selected = withDistance.take(n).toList();
+    return GeofenceSelection(
+      center: center,
+      stores: selected.map((e) => e.store).toList(),
+      boundaryRadiusMeters: selected.last.distance,
+    );
+  }
+}
