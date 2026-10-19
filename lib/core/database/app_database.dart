@@ -20,13 +20,25 @@ class AppSettings extends Table {
   Set<Column> get primaryKey => {key};
 }
 
-@DriftDatabase(tables: [ShoppingItems, AppSettings])
+@DataClassName('StoreRow')
+class Stores extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  RealColumn get latitude => real()();
+  RealColumn get longitude => real()();
+  RealColumn get radius => real()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [ShoppingItems, AppSettings, Stores])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -34,6 +46,9 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.createTable(appSettings);
+          }
+          if (from < 3) {
+            await m.createTable(stores);
           }
         },
       );
